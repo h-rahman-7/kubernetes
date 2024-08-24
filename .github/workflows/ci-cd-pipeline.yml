@@ -17,7 +17,7 @@ jobs:
       uses: docker/setup-buildx-action@v2 # Updated to the latest version
 
     - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
     - name: Build and push app image
       run: |
@@ -93,7 +93,7 @@ jobs:
       uses: actions/checkout@v4 # Updated to the latest version
 
     - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
     - name: Push App Image to Docker Hub
       run: docker push codercomo/app:latest
