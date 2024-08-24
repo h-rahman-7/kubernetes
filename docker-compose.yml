@@ -12,6 +12,7 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: secret
       MYSQL_DB: todos
+
   mysql:
     image: mysql:8.0
     volumes:
@@ -19,12 +20,13 @@ services:
     environment: 
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: todos
+
   web-fe:
-     build: .
-     command: python app.py
-     ports:
+    build: .
+    command: python app.py
+    ports:
       - 5000:5000
-     environment:
+    environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
 
@@ -32,7 +34,6 @@ services:
     image: "redis:alpine"
     ports:
       - 6379
-
 
 volumes:
   todo-mysql-data:
