@@ -1,0 +1,115 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+    - name: Build and push app image
+      run: |
+        docker build -t codercomo/app ./app
+        docker push codercomo/app
+
+    - name: Build and push web-fe image
+      run: |
+        docker build -t codercomo/web-fe ./web-fe
+        docker push codercomo/web-fe
+
+    - name: Pull and tag redis image
+      run: |
+        docker pull redis:alpine
+        docker tag redis:alpine codercomo/redis
+        docker push codercomo/redis
+
+    - name: Pull and tag mysql image
+      run: |
+        docker pull mysql:8.0
+        docker tag mysql:8.0 codercomo/mysql
+        docker push codercomo/mysql
+
+  security_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker image
+      run: docker build -t codercomo/your-image-name .
+
+    - name: Scan Docker image for vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: codercomo/your-image-name
+
+  deploy_infrastructure:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+
+  push_image:
+    needs: [build, security_scan]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push Docker image
+      run: docker push codercomo/your-image-name:latest
+
+  deploy_to_eks:
+    needs: [push_image]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up kubectl
+      run: |
+        aws eks update-kubeconfig --name your-cluster-name --region your-region
+
+    - name: Deploy to EKS
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+
+  setup_monitoring:
+    needs: [deploy_to_eks]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Prometheus & Grafana using Helm
+      run: |
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+        helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
