@@ -1,15 +1,23 @@
-# Start with a lightweight Python image
-FROM python:alpine
+# Use the official Python image from the Docker Hub
+FROM python:3.9-slim
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the app.py and requirements.txt from the current directory on the host to /app in the container
-ADD app.py /app/
-ADD requirements.txt /app/
+# Copy the requirements file into the container at /app
+COPY requirements.txt /app/
 
-# Install dependencies from requirements.txt
-RUN pip install -r requirements.txt
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Set the default command to run when the container starts
+# Copy the rest of the application code into the container
+COPY . /app/
+
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
+
+# Define environment variable
+ENV FLASK_APP=app.py
+
+# Run app.py when the container launches
 CMD ["python", "app.py"]
