@@ -80,6 +80,17 @@ jobs:
       - name: Debugging check
         run: ls -la ./app
 
+      - name: Build app image
+        run: |
+          docker build -t codercomo/app:latest ./app
+          docker images
+
+      - name: Build and tag app image
+        run: |
+            docker build -t codercomo/app:latest ./app
+            docker tag codercomo/app:latest codercomo/app:latest
+            docker images
+            
       - name: Push App Image to Docker Hub
         run: docker push codercomo/app:latest
 
