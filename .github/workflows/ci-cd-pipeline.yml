@@ -77,7 +77,10 @@ jobs:
 
     - name: List Docker images
       run: docker images
-      
+    
+    - name: Debugging check
+      run: ls -la ./app
+
     - name: Push App Image to Docker Hub
       run: docker push codercomo/app:latest
 

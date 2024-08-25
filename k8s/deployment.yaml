@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app-deployment
+  name: app-deployment
   labels:
-    app: my-app
+    app: app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: my-app
+      app: app
   template:
     metadata:
       labels:
-        app: my-app
+        app: app
     spec:
       containers:
-      - name: my-app
+      - name: app
         image: codercomo/app:latest
         ports:
         - containerPort: 80
