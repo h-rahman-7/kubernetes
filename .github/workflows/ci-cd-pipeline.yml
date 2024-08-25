@@ -20,13 +20,15 @@ jobs:
 
       - name: Build app image
         run: |
+          echo "Building app image..."
           docker build -t codercomo/app:latest ./app
-          docker images
+          docker images | grep codercomo/app
 
       - name: Build web-fe image
         run: |
+          echo "Building web-fe image..."
           docker build -t codercomo/web-fe:latest ./web-fe
-          docker images
+          docker images | grep codercomo/web-fe
 
       - name: Pull and tag redis image
         run: |
@@ -77,11 +79,25 @@ jobs:
       - name: List Docker images
         run: docker images
 
+      - name: debugging Check app image
+        run: |
+          echo "Checking if app image exists..."
+          docker images | grep codercomo/app || echo "App image not found"
+
       - name: Push App Image to Docker Hub
-        run: docker push codercomo/app:latest
+        run: |
+          echo "Pushing app image to Docker Hub..."
+          docker push codercomo/app:latest
+
+      - name: debugging Check web-fe image
+        run: |
+          echo "Checking if web-fe image exists..."
+          docker images | grep codercomo/web-fe || echo "Web-fe image not found"
 
       - name: Push Web-Fe Image to Docker Hub
-        run: docker push codercomo/web-fe:latest
+        run: |
+          echo "Pushing web-fe image to Docker Hub..."
+          docker push codercomo/web-fe:latest
 
   setup_monitoring:
     runs-on: ubuntu-latest
@@ -95,8 +111,6 @@ jobs:
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo update
           helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
-
-
 
 
 ## CREATED SIMPLIFIED VERSION BELOW FOR TESTING PURPOSES ##
