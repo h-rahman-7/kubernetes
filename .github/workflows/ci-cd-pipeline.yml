@@ -86,7 +86,7 @@ jobs:
 
   push_images:
     runs-on: ubuntu-latest
-  #   needs: deploy_infrastructure
+     needs: security_scan_app
 
     steps:
     - name: Checkout code
