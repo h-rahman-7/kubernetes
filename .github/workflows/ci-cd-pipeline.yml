@@ -20,13 +20,14 @@ jobs:
 
     - name: Build and push app image
       run: |
-        docker build -t codercomo/app ./app
-        docker push codercomo/app
-
+        docker build -t codercomo/app:latest ./app
+        docker push codercomo/app:latest
+    
     - name: Build and push web-fe image
       run: |
-        docker build -t codercomo/web-fe ./web-fe
-        docker push codercomo/web-fe
+        docker build -t codercomo/web-fe:latest ./web-fe
+        docker push codercomo/web-fe:latest
+    
 
     - name: Pull and tag redis image
       run: |
