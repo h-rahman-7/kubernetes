@@ -103,7 +103,7 @@ jobs:
 
   setup_monitoring:
     runs-on: ubuntu-latest
-    needs: push_images
+    # needs: push_images
 
     steps:
     - name: Install Helm
