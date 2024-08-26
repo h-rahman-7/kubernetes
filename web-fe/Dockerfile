@@ -5,7 +5,7 @@ FROM python:alpine
 WORKDIR /app
 
 # Copy the app.py and requirements.txt from the current directory on the host to /app in the container
-ADD app.py /app/
+# ADD app.py /app/
 ADD requirements.txt /app/
 
 # Install dependencies from requirements.txt

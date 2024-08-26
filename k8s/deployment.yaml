@@ -3,22 +3,22 @@ kind: Deployment
 metadata:
   name: app-deployment
   labels:
-    app: app
+    app: my-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: app
+      app: my-app
   template:
     metadata:
       labels:
-        app: app
+        app: my-app
     spec:
       containers:
       - name: app
         image: codercomo/app:latest
         ports:
-        - containerPort: 80
+        - containerPort: 5000  # Ensure this matches the port your app is listening on
         env:
         - name: ENVIRONMENT
           value: "production"
