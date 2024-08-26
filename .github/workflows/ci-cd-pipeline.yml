@@ -18,12 +18,12 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build app image
-        run: |
-          echo "Building app image..."
-          # Build context is the 'app' directory where the Dockerfile should be
-          docker build -t codercomo/app:latest ./app
-          docker images | grep codercomo/app
+      # - name: Build app image
+      #   run: |
+      #     echo "Building app image..."
+      #     # Build context is the 'app' directory where the Dockerfile should be
+      #     docker build -t codercomo/app:latest ./app
+      #     docker images | grep codercomo/app
 
       - name: Build web-fe image
         run: |
