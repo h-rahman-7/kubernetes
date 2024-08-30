@@ -76,7 +76,7 @@ jobs:
       - name: Scan Docker image for vulnerabilities
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: codercomo/app:latest!!!!FAILURE CHECK!!!!
+          image-ref: codercomo/app:latest
 
       # Discord success notification step
       - name: Send Discord Notification on Success
