@@ -49,13 +49,24 @@ jobs:
           docker tag mysql:8.0 codercomo/mysql:latest
           docker push codercomo/mysql:latest
 
-      # Discord notification step
-      - name: Send Discord Notification
+      # Discord success notification step
+      - name: Send Discord Notification on Success
         if: success()
         run: |
           BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
-          -d "{\"content\": \"✅ Build and push successful for branch: ${BRANCH_NAME}\"}" \
+          -d "{\"content\": \"✅ Build and push successful for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # Discord failure notification step
+      - name: Send Discord Notification on Failure
+        if: failure()
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"❌ Build and push failed for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   security_scan_app:
@@ -65,15 +76,26 @@ jobs:
       - name: Scan Docker image for vulnerabilities
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: codercomo/app:latest123123123123123123213123123123123
+          image-ref: codercomo/app:latest
 
-      # Discord notification step
-      - name: Send Discord Notification
+      # Discord success notification step
+      - name: Send Discord Notification on Success
         if: success()
         run: |
           BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
-          -d "{\"content\": \"✅ Security scan successful for app image on branch: ${BRANCH_NAME}\"}" \
+          -d "{\"content\": \"✅ Security scan successful for app image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # Discord failure notification step
+      - name: Send Discord Notification on Failure
+        if: failure()
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"❌ Security scan failed for app image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   security_scan_web_fe:
@@ -83,15 +105,26 @@ jobs:
       - name: Scan Docker image for vulnerabilities
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: codercomo/web-fe:latest555551123123123
+          image-ref: codercomo/web-fe:latest
 
-      # Discord notification step
-      - name: Send Discord Notification
+      # Discord success notification step
+      - name: Send Discord Notification on Success
         if: success()
         run: |
           BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
-          -d "{\"content\": \"✅ Security scan successful for web-fe image on branch: ${BRANCH_NAME}\"}" \
+          -d "{\"content\": \"✅ Security scan successful for web-fe image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # Discord failure notification step
+      - name: Send Discord Notification on Failure
+        if: failure()
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"❌ Security scan failed for web-fe image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   kubernetes_yaml_lint:
@@ -110,41 +143,22 @@ jobs:
         run: |
           kube-linter lint ./k8s-manifests/ || echo "Linting issues found"
 
-      # Discord notification step
-      - name: Send Discord Notification
+      # Discord success notification step
+      - name: Send Discord Notification on Success
         if: success()
         run: |
           BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
-          -d "{\"content\": \"✅ Kubernetes YAML linting completed for branch: ${BRANCH_NAME}\"}" \
+          -d "{\"content\": \"✅ Kubernetes YAML linting completed for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-
-  # setup_monitoring:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-push
-  #   steps:
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v2
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: us-east-1  
-
-  #     - name: Update kubeconfig for EKS
-  #       run: aws eks update-kubeconfig --name mo-eks-cluster --region us-east-1
-
-  #     - name: Install Helm
-  #       run: curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-  #       # Set this up to check if the name space exists, if it does upgrade to a newer version (rather than uninstall + re-install)
-  #     - name: Install or Upgrade Prometheus & Grafana using Helm
-  #       run: |
-  #         helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-  #         helm repo update
-  #         if helm status prometheus --namespace monitoring; then
-  #           helm upgrade prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
-  #         else
-  #           helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
-  #         fi
-      
+      # Discord failure notification step
+      - name: Send Discord Notification on Failure
+        if: failure()
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"❌ Kubernetes YAML linting failed for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
