@@ -1,3 +1,4 @@
+
 name: CI/CD Pipeline
 
 on:
@@ -52,26 +53,22 @@ jobs:
       # Discord success notification step
       - name: Send Discord Notification on Success
         if: success()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"✅ Build and push successful for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # Discord failure notification step
       - name: Send Discord Notification on Failure
         if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"❌ Build and push failed for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   security_scan_app:
     runs-on: ubuntu-latest
@@ -85,26 +82,22 @@ jobs:
       # Discord success notification step
       - name: Send Discord Notification on Success
         if: success()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"✅ Security scan successful for app image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # Discord failure notification step
       - name: Send Discord Notification on Failure
         if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"❌ Security scan failed for app image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   security_scan_web_fe:
     runs-on: ubuntu-latest
@@ -118,26 +111,22 @@ jobs:
       # Discord success notification step
       - name: Send Discord Notification on Success
         if: success()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"✅ Security scan successful for web-fe image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # Discord failure notification step
       - name: Send Discord Notification on Failure
         if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"❌ Security scan failed for web-fe image on branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   kubernetes_yaml_lint:
     runs-on: ubuntu-latest
@@ -158,23 +147,19 @@ jobs:
       # Discord success notification step
       - name: Send Discord Notification on Success
         if: success()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"✅ Kubernetes YAML linting completed for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # Discord failure notification step
       - name: Send Discord Notification on Failure
         if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           curl -H "Content-Type: application/json" \
           -d "{\"content\": \"❌ Kubernetes YAML linting failed for branch: ${BRANCH_NAME} at ${TIMESTAMP}\"}" \
-          $DISCORD_WEBHOOK_URL
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
