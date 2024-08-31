@@ -28,6 +28,29 @@ jobs:
           docker push codercomo/app:latest
         id: build_app_image
 
+      # Build and push the web-fe image
+      - name: Build and Push Web-Fe Image
+        run: |
+          echo "Building and pushing web-fe image..."
+          docker build -t codercomo/web-fe:latest ./web-fe
+          docker images | grep codercomo/web-fe
+          docker push codercomo/web-fe:latest
+        id: build_web_fe_image
+
+      # Pull, tag, and push the redis image
+      - name: Pull, Tag, and Push Redis Image
+        run: |
+          docker pull redis:alpine
+          docker tag redis:alpine codercomo/redis:latest
+          docker push codercomo/redis:latest
+
+      # Pull, tag, and push the mysql image
+      - name: Pull, Tag, and Push MySQL Image
+        run: |
+          docker pull mysql:8.0
+          docker tag mysql:8.0 codercomo/mysql:latest
+          docker push codercomo/mysql:latest
+
       # Discord notification step (refactored)
       - name: Send Discord Notification
         if: always()
@@ -40,6 +63,7 @@ jobs:
           JOB_STATUS: ${{ job.status }}
           ACTIONS_RUN_URL: "${{ github.run_url }}"
           DOCKER_APP_IMAGE_SIZE: ${{ steps.build_app_image.outputs.size }}
+          DOCKER_WEB_FE_IMAGE_SIZE: ${{ steps.build_web_fe_image.outputs.size }}
         run: |
           if [[ "$JOB_STATUS" == "success" ]]; then
             STATUS_EMOJI="✅"
@@ -53,7 +77,131 @@ jobs:
           -d "{
                 \"embeds\": [{
                   \"title\": \"$STATUS_EMOJI Build and Push Job Result\",
-                  \"description\": \"**Branch**: $BRANCH_NAME\n**Commit**: [$COMMIT_MESSAGE]($COMMIT_URL) by $COMMIT_AUTHOR\n**Time**: $TIMESTAMP\n**Docker Image Size**: $DOCKER_APP_IMAGE_SIZE\n**Job Status**: $JOB_STATUS\",
+                  \"description\": \"**Branch**: $BRANCH_NAME\n**Commit**: [$COMMIT_MESSAGE]($COMMIT_URL) by $COMMIT_AUTHOR\n**Time**: $TIMESTAMP\n**App Image Size**: $DOCKER_APP_IMAGE_SIZE\n**Web-Fe Image Size**: $DOCKER_WEB_FE_IMAGE_SIZE\n**Job Status**: $JOB_STATUS\",
+                  \"color\": $COLOR,
+                  \"fields\": [
+                    { \"name\": \"Logs\", \"value\": \"[View Logs]($ACTIONS_RUN_URL)\" }
+                  ]
+                }]
+              }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  security_scan_app:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: codercomo/app:latest
+
+      # Discord notification step
+      - name: Send Discord Notification
+        if: always()
+        env:
+          BRANCH_NAME: "${GITHUB_REF#refs/heads/}"
+          TIMESTAMP: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          JOB_STATUS: ${{ job.status }}
+          ACTIONS_RUN_URL: "${{ github.run_url }}"
+        run: |
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            STATUS_EMOJI="✅"
+            COLOR=3066993  # Green
+          else
+            STATUS_EMOJI="❌"
+            COLOR=15158332 # Red
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+                \"embeds\": [{
+                  \"title\": \"$STATUS_EMOJI Security Scan Result for App Image\",
+                  \"description\": \"**Branch**: $BRANCH_NAME\n**Time**: $TIMESTAMP\n**Job Status**: $JOB_STATUS\",
+                  \"color\": $COLOR,
+                  \"fields\": [
+                    { \"name\": \"Logs\", \"value\": \"[View Logs]($ACTIONS_RUN_URL)\" }
+                  ]
+                }]
+              }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  security_scan_web_fe:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: codercomo/web-fe:latest
+
+      # Discord notification step
+      - name: Send Discord Notification
+        if: always()
+        env:
+          BRANCH_NAME: "${GITHUB_REF#refs/heads/}"
+          TIMESTAMP: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          JOB_STATUS: ${{ job.status }}
+          ACTIONS_RUN_URL: "${{ github.run_url }}"
+        run: |
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            STATUS_EMOJI="✅"
+            COLOR=3066993  # Green
+          else
+            STATUS_EMOJI="❌"
+            COLOR=15158332 # Red
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+                \"embeds\": [{
+                  \"title\": \"$STATUS_EMOJI Security Scan Result for Web-Fe Image\",
+                  \"description\": \"**Branch**: $BRANCH_NAME\n**Time**: $TIMESTAMP\n**Job Status**: $JOB_STATUS\",
+                  \"color\": $COLOR,
+                  \"fields\": [
+                    { \"name\": \"Logs\", \"value\": \"[View Logs]($ACTIONS_RUN_URL)\" }
+                  ]
+                }]
+              }" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  kubernetes_yaml_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install kube-linter
+        run: |
+          curl -Lo kube-linter.tar.gz https://github.com/stackrox/kube-linter/releases/download/0.2.4/kube-linter-linux.tar.gz
+          tar -xzf kube-linter.tar.gz
+          sudo mv kube-linter /usr/local/bin/
+
+      - name: Run kube-linter on Kubernetes manifests
+        run: |
+          kube-linter lint ./k8s-manifests/ || echo "Linting issues found"
+
+      # Discord notification step
+      - name: Send Discord Notification
+        if: always()
+        env:
+          BRANCH_NAME: "${GITHUB_REF#refs/heads/}"
+          TIMESTAMP: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          JOB_STATUS: ${{ job.status }}
+          ACTIONS_RUN_URL: "${{ github.run_url }}"
+        run: |
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            STATUS_EMOJI="✅"
+            COLOR=3066993  # Green
+          else
+            STATUS_EMOJI="❌"
+            COLOR=15158332 # Red
+          fi
+
+          curl -H "Content-Type: application/json" \
+          -d "{
+                \"embeds\": [{
+                  \"title\": \"$STATUS_EMOJI Kubernetes YAML Linting Result\",
+                  \"description\": \"**Branch**: $BRANCH_NAME\n**Time**: $TIMESTAMP\n**Job Status**: $JOB_STATUS\",
                   \"color\": $COLOR,
                   \"fields\": [
                     { \"name\": \"Logs\", \"value\": \"[View Logs]($ACTIONS_RUN_URL)\" }
