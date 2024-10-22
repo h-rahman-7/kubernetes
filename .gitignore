@@ -1,2 +1,54 @@
-node_modules/   
-# Ignored due to size/not required
+# Node.js related
+node_modules/
+npm-debug.log
+yarn-error.log
+*.log
+
+# Python related
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+env/
+*.egg-info/
+
+# Docker related
+*.docker
+docker-compose.override.yml
+
+# Kubernetes related
+.kube/
+kubectl.kubeconfig
+
+# IDE/Editor related
+.vscode/
+.idea/
+*.swp
+
+# System generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+frontend/node_modules/
+backend/node_modules/
+
+# Lockfiles
+yarn.lock
+package-lock.json
+
+# Ignore compiled files or other unnecessary files
+dist/
+build/
+coverage/
+*.iml
+*.out
+
+# Ignore any sensitive or environment config files
+.env
+*.pem
+db_password.txt
