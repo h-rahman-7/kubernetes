@@ -21,7 +21,9 @@
 	- Message buses ,databases, caches etc
 
 **K8s Architecture Image**
+
 ![alt text](./images/k8sArchitecture.png)
+
 **Composed of**
 - Master Node also known as control plane
 	- Runs Kubernetes services and controllers
