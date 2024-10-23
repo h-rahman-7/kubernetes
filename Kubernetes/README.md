@@ -21,7 +21,8 @@
 	- Message buses ,databases, caches etc
 
 **K8s Architecture Image**
-![[K8s Architecture.png]]**Composed of**
+![alt text](./images/k8sArchitecture.png)
+**Composed of**
 - Master Node also known as control plane
 	- Runs Kubernetes services and controllers
 - Worker Nodes
@@ -31,7 +32,8 @@
 - Container runs in a pod
 	- Pod runs in a node
 		- All nodes form a cluster
-![[ClusterToPod.png]]
+
+![alt text](./images/clusterToPod.png)
 
 ## Running Kubernetes Locally
 
@@ -60,7 +62,8 @@
 
 **Kubernetes CLI**
 - K8s API:
-![[K8s API.png]]
+
+![alt text](./images/k8sAPI.png)
 
 - **kubectl** - The main command for K8s
 	- Communicates with the api server
@@ -73,7 +76,7 @@
 	- The current context is the cluster that is currently the default for kubectl
 		- All kubectl commands run against that cluster
 
-![[kubectlCheatSheet.png]]
+![alt text](./images/kubectl-cheatsheet.png)
 
 - Kube tools
 	- kubectl - Useful for fast context usage, install using: `choco install kubectx-ps` if you have 'Choco' installed
@@ -90,9 +93,13 @@
 	- can be saved in source control
 	- Its like data that can be parsed and modified
 
-**Imperative**![[ImperativeWay.png]]
-**Declarative**
-![[DeclarativeWay.png]]
+**Imperative**:
+
+![alt text](./images/Imperative.png)
+
+**Declarative**:
+
+![alt text](./images/Declarative.png)
 
 ## **YAML**
  - Root level required properties
@@ -109,7 +116,8 @@
 - Create an object using YAML
 	  kubectl create -f [YAML file]
   
-![[PodDefinition.png]]
+![alt text](./images/PodDefinition.png)
+
 **Note:**
 - We do NOT need to type all the YAML manually, we can get the syntax from kubernetes.io/docs and search and copy
 - We can create using manifests (templates) in VS Code, in new YAML file, hitting ctrl+space and select the template you need
@@ -136,9 +144,13 @@
 
 - Define a namespace
 - Specify the namespace when defining objects
-![[PodDefinition2.png]]![[nameSpace definition.png]]
 
-- You can limit resources using the resource quota object![[NetworkPolicyResourceQuote Definition.png]]
+![alt text](./images/pod-namespace.png)
+
+- You can limit resources using the resource quota object
+
+![alt text](./images/resource-quota.png)
 
 **Kubectl - Namespace sheet commands**
-![[kubectl namespace cheatsheet.png]]
+
+![alt text](./images/Namespace-cheatsheet.png)
