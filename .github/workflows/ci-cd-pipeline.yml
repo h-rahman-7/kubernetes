@@ -19,7 +19,6 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # Build, tag, and push the app and web-fe images
       - name: Build and Push Docker Images
         run: |
           # App image
@@ -30,7 +29,6 @@ jobs:
           docker build -t codercomo/web-fe:latest ./web-fe
           docker push codercomo/web-fe:latest
 
-      # Pull, tag, and push common images (Redis & MySQL)
       - name: Pull, Tag, and Push Redis & MySQL Images
         run: |
           docker pull redis:alpine
@@ -41,7 +39,6 @@ jobs:
           docker tag mysql:8.0 codercomo/mysql:latest
           docker push codercomo/mysql:latest
 
-      # Discord success notification
       - name: Send Discord Notification on Success
         if: success()
         run: |
@@ -52,7 +49,6 @@ jobs:
           -d "{\"content\": \"✅ Build and push successful for branch: ${BRANCH_NAME} at ${TIMESTAMP}. Committer: ${COMMITTER}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      # Discord failure notification
       - name: Send Discord Notification on Failure
         if: failure()
         run: |
@@ -72,7 +68,6 @@ jobs:
         with:
           image-ref: codercomo/app:latest
 
-      # Discord success notification
       - name: Send Discord Notification on Success
         if: success()
         run: |
@@ -83,7 +78,6 @@ jobs:
           -d "{\"content\": \"✅ Security scan successful for app image on branch: ${BRANCH_NAME} at ${TIMESTAMP}. Committer: ${COMMITTER}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      # Discord failure notification
       - name: Send Discord Notification on Failure
         if: failure()
         run: |
@@ -103,7 +97,6 @@ jobs:
         with:
           image-ref: codercomo/web-fe:latest
 
-      # Discord success notification
       - name: Send Discord Notification on Success
         if: success()
         run: |
@@ -114,7 +107,6 @@ jobs:
           -d "{\"content\": \"✅ Security scan successful for web-fe image on branch: ${BRANCH_NAME} at ${TIMESTAMP}. Committer: ${COMMITTER}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      # Discord failure notification
       - name: Send Discord Notification on Failure
         if: failure()
         run: |
@@ -141,7 +133,6 @@ jobs:
         run: |
           kube-linter lint ./k8s-manifests/ || echo "Linting issues found"
 
-      # Discord success notification
       - name: Send Discord Notification on Success
         if: success()
         run: |
@@ -152,7 +143,6 @@ jobs:
           -d "{\"content\": \"✅ Kubernetes YAML linting completed for branch: ${BRANCH_NAME} at ${TIMESTAMP}. Committer: ${COMMITTER}\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      # Discord failure notification
       - name: Send Discord Notification on Failure
         if: failure()
         run: |
