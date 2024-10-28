@@ -156,3 +156,46 @@
 **Kubectl - Namespace sheet commands**
 
 ![alt text](./images/Namespace-cheatsheet.png)
+
+
+## Kubernetes Storage
+
+- **Why Persistent Storage?**
+  - Pods are **ephemeral** – created and deleted often, so not ideal for storing data!
+  - Persistent storage provides **data reliability** beyond the pod lifecycle.
+  - Essential for **stateful applications** like:
+    - Databases
+    - Message queues
+    - Apps that need to remember past interactions
+
+- **Persistent Volumes (PV)**
+  - Acts as **dedicated storage** in Kubernetes (like a shared hard drive).
+  - **Created by admins** and available for applications to use.
+  - Think of it as **pre-configured storage** ready to go when needed.
+
+- **Persistent Volume Claim (PVC)**
+  - PVC is how an app requests storage – **“I need space”**.
+  - When a PVC matches an available PV, it gets **bound** to that volume.
+  - Similar to asking IT for shared storage; once approved, you can use it freely.
+
+
+## ConfigMaps
+
+- **Purpose**: Store non-confidential data needed by applications in Kubernetes.
+- **Configuration Management**: Provides a way to manage and supply configuration settings to pods without embedding values directly in application code.
+- **Flexibility**: Allows **dynamic configuration changes** without needing to rebuild the application.
+- **Usage**:
+  - Used for items like environment variables, config files, command-line arguments, etc.
+  - Ideal for things like API URLs, app modes (development, production), and other non-sensitive settings.
+- **Consistency**: Ensures that **pods receive correct configurations** every time they start, making deployments more reliable.
+
+Creating a Config map:
+
+- $ kctl create configmap my-config --from-literal=APP_COLOUR=blue --from-literal=APP_MODE=production
+
+
+## Secrets
+
+Store sensitive data securely 
+
+Base64 encoded
