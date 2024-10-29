@@ -199,3 +199,20 @@ Creating a Config map:
 Store sensitive data securely 
 
 Base64 encoded
+
+Creating a secret with the command:
+`kubectl create secret generic my-secret --from-literal=username=myuser --from-literal=password=mypassword`
+
+When we run the command:
+`kubectl get secrets -o yaml`
+We can see it returns us the values like so:
+
+``` 
+ data:
+    password: bXlwYXNzd29yZA==
+    username: bXl1c2Vy
+```
+
+to `decode` the password we use:
+
+`echo "bXlwYXNzd29yZA==" | base64 -d` which shows us the username/password we entered initally.
