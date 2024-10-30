@@ -216,3 +216,57 @@ We can see it returns us the values like so:
 to `decode` the password we use:
 
 `echo "bXlwYXNzd29yZA==" | base64 -d` which shows us the username/password we entered initally.
+
+
+# K8s Networking
+
+All pods can communicate with all other pods without using network address translation (NAT)
+
+All nodes can communicate with all pods without NAT
+
+The IP that a pods see itself as is the same IP address others sees it as.
+
+For example, we create 2 pods `apache` and `nginx`. we do this using:
+
+`kubectl run apache --image=httpd` and `kubectl run apache --image=nginx`.
+
+This gives us the pods:
+
+```
+> kubectl get pods
+NAME              READY   STATUS    RESTARTS      AGE
+apache            1/1     Running   0             6s
+nginx             1/1     Running   0             14s
+```
+
+From here we can get their IP addresses by doing:
+
+`kubectl get pods -o wide` which returns:
+
+```
+NAME              READY   STATUS    RESTARTS      AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+apache            1/1     Running   0             14s   10.244.0.9   minikube   
+nginx             1/1     Running   0             22s   10.244.0.8   minikube   
+```
+We can then SSH into one of the pods by doing:
+
+`kubectl exec nginx -it -- sh` which then gives us the terminal for the nginx container
+
+We then can run a simple `curl` of the other pod, in this case the apache pod, that shows its working by returning some data:
+
+curl the ip of the other pod, `curl 10.244.0.9` which then returns: `<html><body><h1>It works!</h1></body></html>`
+
+This succesfully indicates that the apache pod has been curled succesfully via the nginx pod without setting up anything.
+
+## Service Discovery and DNS
+
+- How Kubernetes Services work
+- Role of DNS in service discovery within the cluster.
+
+ ### Key Concepts:
+ - Service Types
+ - DNS
+
+ ### Simple DNS Lab
+
+ 
