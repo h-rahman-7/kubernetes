@@ -193,80 +193,103 @@ Creating a Config map:
 
 - $ kctl create configmap my-config --from-literal=APP_COLOUR=blue --from-literal=APP_MODE=production
 
-
 ## Secrets
 
-Store sensitive data securely 
+- Store sensitive data securely in Kubernetes by encoding it as Base64.
+- Create a secret with the command:
+  ```
+  kubectl create secret generic my-secret --from-literal=username=myuser --from-literal=password=mypassword
+  ```
+To retrieve and view secrets in YAML format:
 
-Base64 encoded
-
-Creating a secret with the command:
-`kubectl create secret generic my-secret --from-literal=username=myuser --from-literal=password=mypassword`
-
-When we run the command:
 `kubectl get secrets -o yaml`
-We can see it returns us the values like so:
 
-``` 
- data:
-    password: bXlwYXNzd29yZA==
-    username: bXl1c2Vy
+The output will include encoded values like:
 ```
+data:
+  password: bXlwYXNzd29yZA==
+  username: bXl1c2Vy
+```
+Decode a secret (e.g., password) with:
 
-to `decode` the password we use:
+`echo "bXlwYXNzd29yZA==" | base64 -d` <br>
+This returns the original plaintext values.
 
-`echo "bXlwYXNzd29yZA==" | base64 -d` which shows us the username/password we entered initally.
+## Kubernetes Networking
 
+Pod Networking: All pods can communicate with each other and with nodes without Network Address Translation (NAT).
 
-# K8s Networking
+Cluster-IP Consistency: The IP a pod sees for itself is the same IP that others use to reach it.
 
-All pods can communicate with all other pods without using network address translation (NAT)
-
-All nodes can communicate with all pods without NAT
-
-The IP that a pods see itself as is the same IP address others sees it as.
-
-For example, we create 2 pods `apache` and `nginx`. we do this using:
-
-`kubectl run apache --image=httpd` and `kubectl run apache --image=nginx`.
-
-This gives us the pods:
+For example, create two pods, apache and nginx:
 
 ```
-> kubectl get pods
-NAME              READY   STATUS    RESTARTS      AGE
-apache            1/1     Running   0             6s
-nginx             1/1     Running   0             14s
+kubectl run apache --image=httpd
+kubectl run nginx --image=nginx
 ```
+Verify they’re running:
 
-From here we can get their IP addresses by doing:
-
-`kubectl get pods -o wide` which returns:
+`kubectl get pods`
 
 ```
-NAME              READY   STATUS    RESTARTS      AGE   IP           NODE       NOMINATED NODE   READINESS GATES
-apache            1/1     Running   0             14s   10.244.0.9   minikube   
-nginx             1/1     Running   0             22s   10.244.0.8   minikube   
+NAME    READY   STATUS    RESTARTS   AGE
+apache  1/1     Running   0          10s
+nginx   1/1     Running   0          20s
 ```
-We can then SSH into one of the pods by doing:
+Get pod IP addresses:
 
-`kubectl exec nginx -it -- sh` which then gives us the terminal for the nginx container
 
-We then can run a simple `curl` of the other pod, in this case the apache pod, that shows its working by returning some data:
+`kubectl get pods -o wide`
 
-curl the ip of the other pod, `curl 10.244.0.9` which then returns: `<html><body><h1>It works!</h1></body></html>`
+```
+Copy code
+NAME    READY   STATUS    RESTARTS   AGE   IP          NODE
+apache  1/1     Running   0          20s   10.244.0.9  minikube
+nginx   1/1     Running   0          30s   10.244.0.8  minikube
+```
+Access nginx pod terminal:
+```
+kubectl exec nginx -it -- sh
+```
+Inside nginx, use curl to reach the apache pod:
 
-This succesfully indicates that the apache pod has been curled succesfully via the nginx pod without setting up anything.
+`curl 10.244.0.9`
+
+Expected output:
+
+`<html><body><h1>It works!</h1></body></html>` 
+
+This confirms inter-pod communication without explicit network configuration.
+
 
 ## Service Discovery and DNS
 
-- How Kubernetes Services work
-- Role of DNS in service discovery within the cluster.
+Service Discovery: Kubernetes Services abstract and manage access to pods.
 
- ### Key Concepts:
- - Service Types
- - DNS
+DNS: Enables automatic name resolution for services, facilitating intra-cluster connectivity.
 
- ### Simple DNS Lab
+Key Concepts:
+Service Types: ClusterIP, NodePort, LoadBalancer, etc.
+DNS Lab: Test DNS with a network troubleshooting image:
 
- 
+`kubectl run tmp-shell --rm -i --tty --image=moabukar/netshoot`
+
+## Network Policies
+
+Network policies are sets of rules that govern communication between pods, defining which pods can interact with each other and with external resources. Without these policies, all pods can communicate freely—this isn’t ideal in production, where tighter controls are necessary.
+
+For instance, network policies can restrict frontend pods to only communicate with backend pods, while backend pods connect solely with a database. This ensures structured and secure interactions between services.
+
+### Key Concepts
+- **Pod Communication Control**: Defines how groups of pods communicate with each other and external network endpoints.
+- **Ingress**: Controls incoming traffic to pods.
+- **Egress**: Controls outgoing traffic from pods.
+
+### Ingress Controller
+- Manages external access to services within the cluster, typically over HTTP/HTTPS.
+- Routes external requests to the appropriate service based on predefined rules.
+
+### Egress Controller
+- Controls outbound traffic from the pods to external services.
+- Often used to enforce network security policies and restrict external access.
+
