@@ -17,10 +17,10 @@ resource "helm_release" "cert_manager" {
   create_namespace = true
   namespace        = "cert-manager"
 
-  set {
-    name  = "wait-for"
-    value = module.cert_manager_irsa_role.iam_role_arn
-  }
+  # set {
+  #   name  = "wait-for"
+  #   value = module.cert_manager_irsa_role.iam_role_arn
+  # }
 
   set {
     name  = "installCRDs"
@@ -47,5 +47,22 @@ resource "helm_release" "external_dns" {
 
   values = [
     "${file("helm-values/external-dns.yaml")}"
+  ]
+}
+
+resource "helm_release" "argocd_deploy" {
+  name       = "argocd"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+
+  version = ">=5.19.15"
+
+  timeout          = "600"
+  namespace        = "argo-cd"
+  create_namespace = true
+
+  values = [
+    "${file("helm-values/argocd.yaml")}"
+
   ]
 }

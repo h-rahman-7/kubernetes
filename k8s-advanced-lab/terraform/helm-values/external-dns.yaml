@@ -1,13 +1,12 @@
-provider: aws
-
-env:
-- name: AWS_DEFAULT_REGION
-  value: us-east-1
-
-serviceAccount:
-  annotations:
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-config
+  namespace: external-dns
+data:
+  provider: aws
+  AWS_DEFAULT_REGION: us-east-1
+  serviceAccountAnnotations: |
     eks.amazonaws.com/role-arn: "arn:aws:iam::767398132018:role/external-dns"
-
-
-domainFilters:
-- lab.mohammedsayed.com
+  domainFilters: |
+    - lab.mohammedsayed.com
