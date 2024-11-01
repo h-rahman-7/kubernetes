@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: 'https://github.com/Mo-ASayed/Docker-Kubernetes.git'
+    repoURL: 'https://github.com/Mo-ASayed/Docker-Kubernetes/tree/master/k8s-advanced-lab/terraform.git'
     targetRevision: HEAD
     path: app-hub
 
