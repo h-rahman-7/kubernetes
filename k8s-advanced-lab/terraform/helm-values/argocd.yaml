@@ -24,23 +24,22 @@ spec:
       secretName: argocd-ingress-tls
 
 
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# server:
-#   # to disable SSL redirection. As our ingress controller handles this
-#   extraArgs:
-#     - --insecure
-#   service:
-#     type: ClusterIP
-# ingress:
-#   enabled: true
-#   ingressClassName: "nginx"
-#   annotations:
-#     nginx.org/hsts: "false"
-#     cert-manager.io/cluster-issuer: issuer
-#   hosts:
-#     - argocd.lab.mohammedsayed.com
-#   tls:
-#     - secretName: argocd-ingress-tls
-#       hosts:
-#         - argocd.lab.mohammedsayed.com
+
+server:
+  # to disable SSL redirection. As our ingress controller handles this
+  extraArgs:
+    - --insecure
+  service:
+    type: ClusterIP
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  annotations:
+    nginx.org/hsts: "false"
+    cert-manager.io/cluster-issuer: issuer
+  hosts:
+    - argocd.lab.mohammedsayed.com
+  tls:
+    - secretName: argocd-ingress-tls
+      hosts:
+        - argocd.lab.mohammedsayed.com
