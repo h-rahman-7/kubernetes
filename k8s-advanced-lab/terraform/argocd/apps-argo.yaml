@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/Mo-ASayed/Docker-Kubernetes/tree/master/k8s-advanced-lab/terraform.git'
+    repoURL: 'https://github.com/Mo-ASayed/Docker-Kubernetes.git'
     targetRevision: HEAD
-    path: app-hub
+    path: k8s-advanced-lab/terraform/app-hub  
 
   destination:
     server: 'https://kubernetes.default.svc'
