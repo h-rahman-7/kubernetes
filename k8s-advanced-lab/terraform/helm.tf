@@ -13,11 +13,6 @@ resource "helm_release" "cert_manager" {
   namespace        = "cert-manager"
   create_namespace = true
 
-  # set {
-  #   name  = "wait-for"
-  #   value = module.cert_manager_irsa_role.iam_role_arn
-  # }
-
   set {
     name  = "crds.enabled"
     value = "true"
@@ -26,9 +21,6 @@ resource "helm_release" "cert_manager" {
   values = [
     "${file("helm-values/cert-manager.yaml")}"
   ]
-
-  # depends_on = [module.cert_manager_irsa_role]
-
 }
 
 resource "helm_release" "external_dns" {
@@ -46,8 +38,6 @@ resource "helm_release" "external_dns" {
   values = [
     "${file("helm-values/external-dns.yaml")}"
   ]
-    # depends_on = [module.cert_manager_irsa_role]
-
 }
 
 resource "helm_release" "argocd_deploy" {

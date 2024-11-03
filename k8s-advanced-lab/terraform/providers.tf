@@ -7,7 +7,6 @@ terraform {
   }
 
   required_version = ">=1.0"
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -24,12 +23,9 @@ provider "aws" {
   region = "us-east-1"
 }
 
-
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_name
-  # depends_on = [null_resource.wait_for_eks]
 }
-
 
 provider "helm" {
   kubernetes {
