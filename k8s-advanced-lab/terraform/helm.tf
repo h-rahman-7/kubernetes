@@ -1,7 +1,7 @@
 resource "helm_release" "nginx" {
-  name = "nginx-ingress"
-  repository = "https://helm.nginx.com/stable"
-  chart      = "nginx-ingress"
+  name             = "nginx-ingress"
+  repository       = "https://helm.nginx.com/stable"
+  chart            = "nginx-ingress"
   create_namespace = true
   namespace        = "nginx-ingress"
 }
@@ -26,13 +26,15 @@ resource "helm_release" "cert_manager" {
   values = [
     "${file("helm-values/cert-manager.yaml")}"
   ]
+
+  # depends_on = [module.cert_manager_irsa_role]
+
 }
 
 resource "helm_release" "external_dns" {
-  name       = "external-dns"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "external-dns"
-
+  name             = "external-dns"
+  repository       = "https://charts.bitnami.com/bitnami"
+  chart            = "external-dns"
   create_namespace = true
   namespace        = "external-dns"
 
@@ -44,6 +46,8 @@ resource "helm_release" "external_dns" {
   values = [
     "${file("helm-values/external-dns.yaml")}"
   ]
+    # depends_on = [module.cert_manager_irsa_role]
+
 }
 
 resource "helm_release" "argocd_deploy" {
@@ -57,4 +61,4 @@ resource "helm_release" "argocd_deploy" {
   values = [
     "${file("helm-values/argocdconfig.yaml")}"
   ]
-}
+} 

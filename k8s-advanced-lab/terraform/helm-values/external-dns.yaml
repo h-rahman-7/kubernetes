@@ -6,7 +6,7 @@ env:
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::767398132018:role/cert-manager"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::767398132018:role/external-dns"
 
 domainFilters:
   - lab.mohammedsayed.com

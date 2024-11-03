@@ -11,11 +11,11 @@ spec:
     solvers:
     - dns01:
         route53:
-          hostedZoneID: "Z0532739DYWX1VAIUKTG"
+          hostedZoneID: Z0532739DYWX1VAIUKTG
           region: us-east-1
       selector:
         dnsZones:
-          - "lab.mohammedsayed.com"
+        - "lab.mohammedsayed.com"
     - http01:
         ingress:
           class: "nginx"

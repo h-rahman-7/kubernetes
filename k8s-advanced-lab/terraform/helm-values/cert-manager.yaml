@@ -1,4 +1,6 @@
-ingressShim:
+# ingressShim:
+#   defaultACMEChallengeType: dns01
+#   defaultACMEDNS01ChallengeProvider: route53
 
 extraArgs:
     - --dns01-recursive-nameservers="8.8.8.8:53"
