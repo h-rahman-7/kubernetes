@@ -24,15 +24,5 @@ module "eks" {
   }
 
   tags = local.tags
-  
+
 }
-
-# resource "aws_iam_role_policy_attachment" "eks_admin_policy" {
-#   role       = aws_iam_role.eks_cluster_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSAdminPolicy"
-# }
-
-# resource "aws_iam_role_policy_attachment" "eks_cluster_admin_policy" {
-#   role       = aws_iam_role.eks_cluster_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterAdminPolicy"
-# }

@@ -5,7 +5,6 @@ metadata:
   namespace: argo-cd
 spec:
   project: default
-
   source:
     repoURL: 'https://github.com/Mo-ASayed/Docker-Kubernetes/tree/master/k8s-advanced-lab/terraform.git'
     targetRevision: HEAD
@@ -14,7 +13,6 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: apps
-
   syncPolicy:
     automated:
       prune: true

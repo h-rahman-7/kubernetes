@@ -4,8 +4,8 @@ locals {
   region = "us-east-1"
 
   tags = {
-    Environment = "sandbox"            
-    Project    = "EKS Advanced Lab"
-    Owner      = "Mo"
+    Environment = "sandbox"
+    Project     = "EKS Advanced Lab"
+    Owner       = "Mo"
   }
 }
