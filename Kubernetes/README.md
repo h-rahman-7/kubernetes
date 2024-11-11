@@ -293,3 +293,84 @@ For instance, network policies can restrict frontend pods to only communicate wi
 - Controls outbound traffic from the pods to external services.
 - Often used to enforce network security policies and restrict external access.
 
+## Types of Services
+## 1. ClusterIP
+- Default Service Type in Kubernetes.
+- Exposes the Service only within the cluster, making it inaccessible from outside.
+- Ideal for internal communication between different components of the application.
+- Uses a cluster-internal IP that other Pods can access.
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-clusterip-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: my-app
+```
+## 2. NodePort
+
+- Exposes the Service on a static port (between 30000-32767) on each Node in the cluster.
+- NodePort: the port on each Node that allows external access.
+- Port: the port on the Service for internal communication within the cluster.
+- TargetPort: the actual port on the Pod.
+- Good for basic external access, but it exposes every node and is generally not used in production.
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nodeport-service
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30007
+  selector:
+    app: my-app
+```
+
+## 3. LoadBalancer
+- Creates an external load balancer that directs traffic to the Service's Pods.
+- Ideal for production, especially on cloud providers (AWS, GCP), where it automatically provisions load balancing infrastructure.
+-Uses NodePort and ClusterIP internally, providing simplicity for exposing services externally.
+- Note: This can be costly as it depends on the cloud provider's load balancing features.
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-loadbalancer-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: my-app
+```
+
+## 4. ExternalName
+- Maps a Service to an external DNS name (e.g., `example.com`), without creating a new endpoint.
+- Adds a DNS CNAME record to allow access to external services by name within the cluster.
+- Useful for services outside the cluster that need internal access by name.
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-externalname-service
+spec:
+  type: ExternalName
+  externalName: example.com
+```
+## Ports in Kubernetes Services
+### NodePort, Port, and TargetPort Explained
+- Port: The internal cluster port used by other services in the cluster to access this Service.
+- TargetPort: The specific port on the Pod that the Service points to.
+- NodePort: Exposes the Service on a fixed port across each node, allowing external access (used with `NodePort` or `LoadBalancer` services).
