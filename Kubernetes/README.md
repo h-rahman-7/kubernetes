@@ -374,3 +374,7 @@ spec:
 - Port: The internal cluster port used by other services in the cluster to access this Service.
 - TargetPort: The specific port on the Pod that the Service points to.
 - NodePort: Exposes the Service on a fixed port across each node, allowing external access (used with `NodePort` or `LoadBalancer` services).
+
+
+## Scheduling
+
