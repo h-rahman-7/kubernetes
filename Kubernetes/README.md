@@ -158,7 +158,7 @@
 ![alt text](./images/Namespace-cheatsheet.png)
 
 
-## Kubernetes Storage
+# Kubernetes Storage
 
 - **Why Persistent Storage?**
   - Pods are **ephemeral** – created and deleted often, so not ideal for storing data!
@@ -179,7 +179,7 @@
   - Similar to asking IT for shared storage; once approved, you can use it freely.
 
 
-## ConfigMaps
+# ConfigMaps
 
 - **Purpose**: Store non-confidential data needed by applications in Kubernetes.
 - **Configuration Management**: Provides a way to manage and supply configuration settings to pods without embedding values directly in application code.
@@ -215,7 +215,7 @@ Decode a secret (e.g., password) with:
 `echo "bXlwYXNzd29yZA==" | base64 -d` <br>
 This returns the original plaintext values.
 
-## Kubernetes Networking
+# Kubernetes Networking
 
 Pod Networking: All pods can communicate with each other and with nodes without Network Address Translation (NAT).
 
@@ -274,7 +274,7 @@ DNS Lab: Test DNS with a network troubleshooting image:
 
 `kubectl run tmp-shell --rm -i --tty --image=moabukar/netshoot`
 
-## Network Policies
+# Network Policies
 
 Network policies are sets of rules that govern communication between pods, defining which pods can interact with each other and with external resources. Without these policies, all pods can communicate freely—this isn’t ideal in production, where tighter controls are necessary.
 
@@ -293,7 +293,7 @@ For instance, network policies can restrict frontend pods to only communicate wi
 - Controls outbound traffic from the pods to external services.
 - Often used to enforce network security policies and restrict external access.
 
-## Types of Services
+# Types of Services
 ## 1. ClusterIP
 - Default Service Type in Kubernetes.
 - Exposes the Service only within the cluster, making it inaccessible from outside.
@@ -376,5 +376,152 @@ spec:
 - NodePort: Exposes the Service on a fixed port across each node, allowing external access (used with `NodePort` or `LoadBalancer` services).
 
 
-## Scheduling
+# Scheduling
 
+Kubernetes Scheduling is responsible for assigning Pods to Nodes in a cluster. 
+The scheduler considers resource availability, constraints, and other factors to ensure Pods are efficiently distributed across the Nodes.
+
+### 1. Basic Scheduling Concepts: <br>
+- Scheduler: The core component that decides where each Pod should run.
+- Node Selection: The scheduler selects an appropriate Node based on resource requests, Node capacity, and constraints defined for each Pod.
+- Binding: Once a Node is chosen, the Pod is bound to that Node for deployment.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-scheduled-pod
+spec:
+  nodeName: node01
+  containers:
+    - name: app-container
+      image: nginx
+```
+
+### 2. Resource Requests and Limits
+- Requests: Minimum resources (CPU, memory) a Pod needs to function. Ensures the Pod has enough resources allocated on a Node.
+- Limits: Maximum resources a Pod can consume. Prevents Pods from overusing resources and affecting other workloads.
+Helps the scheduler determine if a Node has sufficient resources to support a Pod.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-resource-pod
+spec:
+  containers:
+    - name: app-container
+      image: nginx
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+```
+
+### 3. Affinity and Anti-Affinity <br>
+- Affinity: Specifies that a Pod should run near other specified Pods, often for performance or proximity needs.
+- Anti-Affinity: Specifies that a Pod should avoid certain Nodes or Pods, often to increase redundancy or prevent resource conflicts.
+Defined using Node or Pod labels to guide the scheduler’s placement decisions.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-affinity-pod
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: my-app
+          topologyKey: "kubernetes.io/hostname"
+  containers:
+    - name: app-container
+      image: nginx
+```
+
+### 4. Taints and Tolerations
+- Taints: Applied to Nodes to repel certain Pods, typically to reserve Nodes for specific tasks.
+- Tolerations: Applied to Pods to allow them to tolerate certain Node taints, granting access to those Nodes.
+Useful for workloads that require isolation or specialised Node resources.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-toleration-pod
+spec:
+  tolerations:
+    - key: "example-key"
+      operator: "Exists"
+      effect: "NoSchedule"
+  containers:
+    - name: app-container
+      image: nginx
+```
+
+### 5. Node Selectors and Node Affinity
+- Node Selectors: Basic method of specifying which Nodes a Pod should run on based on labels.
+- Node Affinity: More advanced than Node Selectors, allowing expressions and conditions for scheduling decisions.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-node-affinity-pod
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: "kubernetes.io/e2e-az-name"
+                operator: In
+                values:
+                  - e2e-az1
+                  - e2e-az2
+  containers:
+    - name: app-container
+      image: nginx
+```
+
+# Selectors
+
+To create and label pods, we write under `metadata`:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+	name: web-app
+	labels:
+		app: App1
+		function: Front-endpoint
+```
+You can have as many different labels as you want
+
+To select the pod once its created using a specific label we can use `--selector` for example:
+
+`kubectl get pods --selector app=App1` if the label is only checking for `App1` anywhere, you can also use `kubectl get pods --selector=App1`
+
+To get a specific pod for example: "Identify the POD which is part of the prod environment, the finance BU and of frontend tier?":
+
+We can use: `k get all --selector env=prod,bu,tier=frontend`
+
+In `Replica Sets` we use `Selectors` and `matchLabels` to specify which pod we want with the corresponding name:
+
+```
+spec:
+	replicas: 3
+	selector: 
+		matchLabels:
+			app: App1
+	template:
+		metadata:
+			labels:
+				app: App1
+```
