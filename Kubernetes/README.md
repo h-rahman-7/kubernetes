@@ -463,6 +463,39 @@ spec:
     - name: app-container
       image: nginx
 ```
+### Tainting:
+To tain nodes you can use: `kubectl taint nodes node-name key=value:tain-effect`
+
+There are 3 taint effects:
+
+- NoSchedule - wont be scheduled on the node
+- PreferNoSchedule - try to avoid placing it on the node but NOT guaranteeed
+- NoExecute - new pods wont be scheduled and existing pods will be evicted if they don't tolerate the taint
+
+example: `kubectl taint nodes node1 app=blue:NoSchedule` 
+
+### Tolerating
+
+Tolerations are added to pods, firstly you must:
+
+- Pull up the pod definition file
+- Under `spec` you add a line called "tolerations" and move the `same values` used whilst creating the taint:
+- So for the above example command it would look like:
+
+```
+  tolerations:
+    - key: "app"
+	  operator: "Equal"
+	  value: "blue"
+	  effect: "NoSchedule"
+```
+### Important Note: All the toleration values must be encoded in double quotes " " 
+
+### Also worth noting is, taints prevent pods from being added to a particular node, but it also doesnt
+### prevent the tainted pod to be added to a non-tainted node! It only tells the node to accept pods with certain requirements
+
+If you want to restrict pods from nodes then you use `nodeAffinity`.
+
 
 ### 5. Node Selectors and Node Affinity
 - Node Selectors: Basic method of specifying which Nodes a Pod should run on based on labels.
@@ -479,17 +512,78 @@ spec:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: "kubernetes.io/e2e-az-name"
+              - key: size
                 operator: In
                 values:
-                  - e2e-az1
-                  - e2e-az2
-  containers:
-    - name: app-container
-      image: nginx
+                  - Large
+                  - Medium
 ```
 
-# Selectors
+You can also label it to specify `NotIN` something:
+```
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: size
+                operator: NotIn
+                values:
+                  - Small
+```
+
+If you labelled the nodes previously, you don't need to specify a value on a pod with "value: small", you can simple use `operator: Exists`
+
+```
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: Size
+                operator: Exists
+
+```
+
+### Labelling nodes
+
+`kubectl label nodes <node-name> <label-key>=<label-value>`:
+ Can be run like so:
+`kubectl label nodes node-1 size=Large`
+
+Under spec, we add a new line called `nodeSelector`:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+  - name: data
+    image: data
+  nodeSelector:
+    size: Large
+```
+
+There are multiple Affinity Types:
+
+Type 1: `requiredDuringSchedulingIgnoredDuringExecution` <br>
+& <br>
+Type 2: `preferredDuringSchedulingIgnoredDuringExecution`
+& <br>
+Type 3: `requiredDuringSchedulingRequiredDuringExecution`
+The difference:
+
+| | DuringScheduling | DuringExecution |
+------|---------------|------------------|
+| Type 1 | Required | Ignored |
+|Type 2 | Preffered | Ignored |
+|Type 3| Required | Required
+
+## Selectors
 
 To create and label pods, we write under `metadata`:
 
