@@ -1,81 +1,74 @@
-# CI/CD Pipeline with GitHub Actions, Docker, Kubernetes, and AWS EKS
+# K8s Advanced Project  
+_Hello and welcome to K8s advanced labs. In this project we will be discussing how to set up a production grade EKS cluster from start to finish_  
 
-This repository contains the configuration and setup for a **CI/CD pipeline** that automates the process of building, testing, and deploying Dockerised applications to an AWS EKS (Elastic Kubernetes Service) cluster. This setup ensures that applications are continuously integrated and deployed efficiently and securely.
+Just like a real world dev environment we will be discussing:
+- how to host your app and,
+- expose securely to public using industry standards tools
+  - includes setting up DNS records and managing certificates for https
+- automating set-up efficiently, reliably and securley
 
-## 🚀 Overview
+By the of this exercise you should grasp how to take an application from internal deployment all the way to being acessible securely over the internet.
 
-The CI/CD pipeline automates the following processes:
+The key takeaways for DevOps:
+`making sure things are scalable, maintainable and reliable`
 
-- **Build Docker Images**: Create Docker images for applications.
-- **Push Images to Docker Hub**: Upload the built images to a Docker repository.
-- **Security Scanning**: Scan images for vulnerabilities.
-- **Deploy to AWS EKS**: Deploy the Docker images to a Kubernetes cluster on AWS EKS.
-- **Monitoring Setup (Optional)**: Configure monitoring tools such as Prometheus and Grafana.
+This project mirrors what you would encounter in a production environment touching on the tools and processes that happen bts. 
 
-## 🔄 Pipeline Workflow
+## What tools will we use?
+- create clusters using terraform on AWS via EKS
+- Helm (K8s package manager)
+- NGINX ingress controller (ingress traffic routing management) 
+- Let's encrypt (certificate authority)
+- cert-manager (to automate certificate mangement)
+- external-dns (automate and sync services with your DNS provider, in this case route53)
+- add ArgoCD 
 
-The pipeline is defined using GitHub Actions and includes the following key steps:
 
-### 1. Build and Push Docker Images
 
-- **Log in to Docker Hub**: Authenticate using stored credentials.
-- **Build Images**: Create Docker images for both the application and web frontend.
-- **Push Images**: Upload the images to Docker Hub.
 
-### 2. Security Scanning
 
-- **Scan Images**: Use [Trivy](https://github.com/aquasecurity/trivy) to identify vulnerabilities in the Docker images.
 
-### 3. Deploy to AWS EKS
 
-- **Configure AWS Credentials**: Set up AWS access for deployment.
-- **Update kubeconfig**: Point to the EKS cluster.
-- **Deploy**: Apply Kubernetes manifests to deploy the images.
 
-### 4. Monitoring Setup (Optional)
 
-- **Install Helm**: Package manager for Kubernetes.
-- **Deploy Monitoring Tools**: Install Prometheus and Grafana using Helm.
 
-## 🛠️ Getting Started
 
-### Prerequisites
 
-- **GitHub Repository**: Ensure your code is hosted on GitHub.
-- **Docker**: Docker installed locally for testing.
-- **AWS EKS**: An active AWS EKS cluster.
-- **Docker Hub Account**: For storing and retrieving Docker images.
-- **GitHub Secrets**: Set up secrets for Docker Hub and AWS credentials.
 
-### Setup Instructions
 
-1. **Configure GitHub Secrets**:
-   - Navigate to the repository settings on GitHub.
-   - Add secrets for `DOCKERHUB_USERNAME`, `DOCKERHUB_PASSWORD`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`.
 
-2. **Add GitHub Actions Workflow**:
-   - Create a `.github/workflows/ci-cd-pipeline.yml` file in your repository.
-   - Copy and modify the provided workflow YAML file to suit your project structure.
 
-3. **Ensure Dockerfile Accuracy**:
-   - Verify that your `Dockerfile` is correctly configured for your application.
 
-4. **Commit and Push**:
-   - Commit your changes and push to the `master` branch to trigger the pipeline.
 
-## 🐞 Troubleshooting
 
-- **Image Not Found**: Ensure Docker images are tagged correctly and match the expected names.
-- **Build Failures**: Check Dockerfile paths and dependencies.
-- **Deployment Issues**: Verify AWS credentials and Kubernetes configurations.
 
-## 💡 Additional Tips
 
-- **Modular Configuration**: Keep YAML configurations flexible to adapt to changes in cloud environments.
-- **Security**: Regularly scan images for vulnerabilities to maintain a secure deployment environment.
-- **Caching**: Use caching to speed up builds and reduce resource consumption.
 
-## 🤝 Contributing
 
-Feel free to submit issues or pull requests to improve this CI/CD pipeline setup.
 
+
+Get the secret password for the argo-cd login:
+
+`kubectl get secret argocd-initial-admin-secret -n argo-cd -o jsonpath='{.data.password}' | base64 --decode`
+
+When kubectl get <resource> doesnt work, the steps to fix it:
+
+`aws eks update-kubeconfig --region us-east-1 --name eks-lab`
+
+or
+
+Add the access policies to the EKS cluster:
+
+`AmazonEKSAdminPolicy` and `AmazonEKSClusterAdminPolicy`
+
+Update the kubeconfig:
+
+`aws eks --region us-east-1 update-kubeconfig --name eks-lab`
+
+Deploy the ingress using:
+
+`kubectl apply -f https://raw.githubusercontent.com/kubernetes/nginx-ingress/main/deploy/static/provider/cloud/deploy.yaml`
+
+If CRD's dont get installed correctly run:
+
+`kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.10.1/cert-manager.crds.yaml`
